@@ -1,3 +1,5 @@
+local realmName = GetRealmName();
+
 -- output color
 local color = "|cFFD2B48C";
 local highlight = "|cFFd8c7af";
@@ -59,6 +61,12 @@ local function playFartSound()
 	PlaySoundFile("interface\\addons\\FartPatrol\\fart.ogg", "Master");
 end
 
+-- play long fart sound file
+local function playLongFartSound()
+	-- PlaySound(117484, "Master");
+	PlaySoundFile("interface\\addons\\FartPatrol\\LongFart.mp3", "Master");
+end
+
 -- format text names to match Blizzard convention
 local function formatName(msg)
 	local name, junk = msg:match("^(%S*)%s*(.-)$");
@@ -84,7 +92,10 @@ hooksecurefunc("DoEmote", function(token, unit)
 	if UnitExists(unit) and not UnitIsUnit(unit, "player") then
 		-- check if unit is a player
 		if UnitIsPlayer(unit) then
-			local name = UnitName(unit);
+			local pname, realm = UnitName(unit);
+			if realm == nil then realm = realmName; end
+			realm = string.gsub(realm, "%s+", "");
+			local name = pname .. "-" .. realm;
 			-- check if fart spam
 			if waiting.iFartedOn[name] == nil then
 				-- count the fart
@@ -95,7 +106,11 @@ hooksecurefunc("DoEmote", function(token, unit)
 				waiting.iFartedOn[name] = true;
 				C_Timer.After(10, function() waiting.iFartedOn[name] = nil; end); -- prevent /fart spam from counting
 				-- play a fart sound
-				playFartSound();
+				if math.fmod(fartcount,10) == 0 then
+					playLongFartSound();
+				else
+					playFartSound();
+				end
 				if isValidFartZone() then
 					-- chat
 					SendChatMessage("Farted on "..name..". Total farts on "..name..": "..fartcount , "SAY", nil,  DEFAULT_CHAT_FRAME.editBox.languageID); 
@@ -110,8 +125,13 @@ end)
 
 -- fartee events - count who farted on you
 function FP.CHAT_MSG_TEXT_EMOTE(self, event, ...)	
-	local emote, name, _ = ...; -- get the args from the event
+	local emote, pname, _, _, _, _, _, _, _, _, _, GUID  = ...; -- get the args from the event
+	local className, classId, raceName, raceId, gender, playername, realm = GetPlayerInfoByGUID(GUID);
 	-- check chat for fart emote string
+	print(realm);
+	if realm == "" then realm = realmName; end
+	realm = string.gsub(realm, " ", "");
+	local name = pname .. "-" .. realm;
 	if strfind(emote, "brushes up against you and farts loudly.") then
 		-- check if fart spam
 		if waiting.fartedOnMe[name] == nil then
@@ -123,10 +143,14 @@ function FP.CHAT_MSG_TEXT_EMOTE(self, event, ...)
 			waiting.fartedOnMe[name] = true;
 			C_Timer.After(10, function() waiting.fartedOnMe[name] = nil; end) -- prevent /fart spam from counting
 			-- play a fart sound
-			playFartSound();
+			if math.fmod(fartcount,10) == 0 then
+				playLongFartSound();
+			else
+				playFartSound();
+			end
 			if isValidFartZone() then
 				-- chat
-				SendChatMessage("Fart detected by "..name..". Total farts counted by "..name..": "..fartcount , "SAY", nil,  DEFAULT_CHAT_FRAME.editBox.languageID); 
+				SendChatMessage("has detected a fart by "..name..". Total farts counted by "..name..": "..fartcount , "EMOTE", nil,  DEFAULT_CHAT_FRAME.editBox.languageID); 
 			else
 				-- report to self only
 				print(color .. "Fart detected by "..name..". Total farts counted by "..name..": "..fartcount);

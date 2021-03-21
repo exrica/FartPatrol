@@ -1,3 +1,12 @@
+Version 1.1
+ - Cross realm support for names.
+
+Version 1.01
+- Special Fart noises when farted on.
+
+Version 1.0
+- Special Fart noise for Rozzy. Enjoy.
+
 Version 0.9.9
 - Added commands to turn all /say chat on or off. Turning /say chat
   back on using the chaton command will not clear disabled zones.
