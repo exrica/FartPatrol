@@ -1,3 +1,9 @@
+Version 1.12
+ - Updated compatibility for patch 9.1.
+
+Version 1.11
+ - Removed debug line.
+
 Version 1.1
  - Cross realm support for names.
 

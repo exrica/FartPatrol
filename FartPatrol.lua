@@ -128,7 +128,6 @@ function FP.CHAT_MSG_TEXT_EMOTE(self, event, ...)
 	local emote, pname, _, _, _, _, _, _, _, _, _, GUID  = ...; -- get the args from the event
 	local className, classId, raceName, raceId, gender, playername, realm = GetPlayerInfoByGUID(GUID);
 	-- check chat for fart emote string
-	print(realm);
 	if realm == "" then realm = realmName; end
 	realm = string.gsub(realm, " ", "");
 	local name = pname .. "-" .. realm;
